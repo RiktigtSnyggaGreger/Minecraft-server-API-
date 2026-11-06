@@ -1,6 +1,7 @@
 <?php
 header('Content-Type: application/json; charset=utf-8');
 require __DIR__ . '/db.php';
+require __DIR__ . '/player.php';
 
 // ============================================================
 //  Hjälpfunktioner
@@ -25,9 +26,13 @@ function read_json(string $file): ?array
 $method = $_SERVER['REQUEST_METHOD'];
 $path   = rtrim(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '/') ?: '/';
 
-// GET /
-if ($method === 'GET' && $path === '/') {
-    respond(['status' => 'ok', 'database' => $db->server_info]);
+// GET /players
+if ($method === 'GET' && $path === '/players') {
+    $list = [];
+    foreach (get_players() as $uuid => $name) {
+        $list[] = ['name' => $name, 'uuid' => $uuid] + get_player_stats($uuid);
+    }
+    respond($list);
 }
 
 // Ingen route matchade

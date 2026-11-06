@@ -9,10 +9,9 @@ try {
         getenv('DB_NAME')
     );
     $db->set_charset('utf8mb4');
-} catch (mysqli_sql_exeption $e) {
+} catch (mysqli_sql_exception $e) {
     error_log($e->getMessage());   // hamnar i: docker compose logs php
     http_response_code(500);
     echo json_encode(['error' => 'Database unavailable']);
     exit;
 }
-?>
