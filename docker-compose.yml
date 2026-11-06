@@ -12,6 +12,7 @@ services:
     restart: unless-stopped
     volumes:
       - ./app:/var/www/html
+      - /home/ed/minecraft/data:/minecraft:ro
     environment:
       DB_HOST: db
       DB_NAME: appdb
