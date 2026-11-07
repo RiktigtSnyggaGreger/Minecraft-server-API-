@@ -44,4 +44,13 @@ if ($method === 'GET' && $path === '/leaderboard') {
 if ($method === 'GET' && preg_match('#^/leaderboard/(\w+)$#', $path, $m)) {
     respond(get_leaderboard($m[1]));
 }
+
+if ($method === 'GET' && preg_match('#^/leaderboard/(\w+)/(\w+)$#', $path, $m)) {
+    respond(get_item_leaderboard($m[1], $m[2]));
+}
+
+if ($method === 'GET' && $path === '/stats') {
+    respond(get_server_stats());
+}
+
 respond(['error' => 'Not found'], 404);

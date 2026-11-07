@@ -4,6 +4,10 @@ const USERCACHE = MC_DIR . '/usercache.json';
 const STATS_DIR = MC_DIR . '/world/players/stats';
 const ADVANCEMENTS_DIR = MC_DIR . '/world/players/advancements';
 
+// Antal advancements i spelet (utan recept), räknat i serverns jar-fil för 26.3.
+// Uppdatera när Minecraft uppdateras!
+const ADVANCEMENTS_TOTAL = 126;
+
 // ============================================================
 //  Player
 // ============================================================
@@ -76,6 +80,7 @@ function get_player_list() {
             'play_time_hours' => $hours,
             'last_seen' => $last_seen,
             'advancements' => count(read_advancements($uuid)),
+            'advancements_total' => ADVANCEMENTS_TOTAL,
         ];
     }
 
@@ -115,11 +120,14 @@ function get_advancements($id) {
     if (!is_file(ADVANCEMENTS_DIR . '/' .  $uuid . '.json')) {
         respond(['error' => 'Player not found'], 404);
     }
+    $done = read_advancements($uuid);
 
     return [
         'uuid' => $uuid,
         'name' => $names[$uuid] ?? null,
-        'advancements' => read_advancements($uuid),
+        'count' => count($done),
+        'total' => ADVANCEMENTS_TOTAL,
+        'advancements' => $done,
     ];
 }
 function read_advancements($uuid) {
