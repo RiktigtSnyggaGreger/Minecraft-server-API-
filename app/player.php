@@ -22,8 +22,9 @@ function get_player($id) {
         respond(['error' => 'Player not found'], 404);
     }
     $names = get_players();
+    $name = $names[$uuid] ?? null;
     $stats = read_json(STATS_DIR . '/' .  $uuid . '.json');
-    if ($stats === null) {
+    if ($stats === null && $name === null) {
         respond(['error' => 'Player not found'], 404);
     }
     $ticks = $stats['stats']['minecraft:custom']['minecraft:play_time'] ?? 0;
@@ -31,9 +32,9 @@ function get_player($id) {
     $hours = round($ticks / 72000, 1);
     return [
         'uuid' => $uuid,
-        'name' => $names[$uuid] ?? null,
+        'name' => $name,
         'play_time_hours' => $hours,
-        'stats' => clean_stats($stats['stats']),
+        'stats' => clean_stats($stats['stats'] ?? []),
     ];
 }
 
