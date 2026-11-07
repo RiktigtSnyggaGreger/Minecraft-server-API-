@@ -5,6 +5,7 @@ header('Access-Control-Allow-Origin: *');
 require __DIR__ . '/helper.php';
 require __DIR__ . '/db.php';
 require __DIR__ . '/player.php';
+require __DIR__ . '/leaderboard.php'; 
 
 // ============================================================
 //  Router
@@ -36,4 +37,11 @@ if ($method === 'GET' && preg_match('#^/players/([\w-]+)/advancements$#', $path,
     respond(get_advancements($m[1]));
 }
 
+if ($method === 'GET' && $path === '/leaderboard') {
+    respond(get_all_leaderboards());
+}
+
+if ($method === 'GET' && preg_match('#^/leaderboard/(\w+)$#', $path, $m)) {
+    respond(get_leaderboard($m[1]));
+}
 respond(['error' => 'Not found'], 404);
