@@ -51,6 +51,11 @@ function get_player_list() {
             'advancements' => count(read_advancements($uuid)),
         ];
     }
+    // En lätt sort.. Sortar den som har mest timmar
+    usort($list, function ($a, $b) {
+        return $b['play_time_hours'] <=> $a['play_time_hours'];
+    });
+
     return $list;
 }
 
