@@ -45,10 +45,25 @@ function get_server_status() {
 
     $status = json_decode($json, true);
 
-    // Steg 6, din tur: plocka ut det du vill visa ur $status
+    // Namnen på dem som är online (sample finns bara när någon är inne)
+    $players = [];
+    foreach ($status['players']['sample'] ?? [] as $p) {
+        $players[] = $p['name'];
+    }
+
+    // MOTD är vanlig text, men med färger skickar Minecraft ett objekt: {"text": "...", ...}
+    $motd = $status['description'] ?? '';
+    if (is_array($motd)) {
+        $motd = $motd['text'] ?? '';
+    }
+
     return [
         'online' => true,
-        'raw' => $status,
+        'version' => $status['version']['name'] ?? null,
+        'motd' => trim($motd),
+        'players_online' => $status['players']['online'] ?? 0,
+        'players_max' => $status['players']['max'] ?? 0,
+        'players' => $players,
     ];
 }
 
