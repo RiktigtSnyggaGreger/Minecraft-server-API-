@@ -4,6 +4,9 @@ const USERCACHE = MC_DIR . '/usercache.json';
 const STATS_DIR = MC_DIR . '/world/players/stats';
 const ADVANCEMENTS_DIR = MC_DIR . '/world/players/advancements';
 
+// ============================================================
+//  Player
+// ============================================================
 function get_players() {
     $cashe = read_json(USERCACHE) ?? [];
     $usernames = [];
@@ -34,6 +37,9 @@ function get_player($id) {
     ];
 }
 
+// ============================================================
+//  Clean stats, för annars står de minecraft: 
+// ============================================================
 function clean_stats($stats) {
     $clean = [];
     foreach ($stats as $category => $items) {
@@ -45,7 +51,9 @@ function clean_stats($stats) {
     }
     return $clean;
 }
-
+// ============================================================
+//  Advancements
+// ============================================================
 function get_advancements($id) {
     $uuid = resolve_uuid($id);
     if ($uuid === null) {
@@ -76,6 +84,10 @@ function get_advancements($id) {
         'advancements' => $done,
     ];
 }
+
+// ============================================================
+//  uuid fix
+// ============================================================
 
 function find_uuid($name) {
     $names = get_players();

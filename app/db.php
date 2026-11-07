@@ -1,6 +1,8 @@
 <?php
 mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
-
+// ============================================================
+//  Databas!
+// ============================================================
 try {
     $db = new mysqli(
         getenv('DB_HOST'),
