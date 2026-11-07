@@ -4,6 +4,7 @@ header('Access-Control-Allow-Origin: *');
 
 require __DIR__ . '/helper.php';
 require __DIR__ . '/db.php';
+/** @var mysqli $db  (skapas i db.php, kommentaren hjälper bara editorn) */
 require __DIR__ . '/player.php';
 require __DIR__ . '/leaderboard.php';
 require __DIR__ . '/server.php';
