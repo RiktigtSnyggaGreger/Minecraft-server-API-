@@ -26,13 +26,12 @@ function read_json(string $file): ?array
 $method = $_SERVER['REQUEST_METHOD'];
 $path   = rtrim(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '/') ?: '/';
 
-// GET /players
 if ($method === 'GET' && $path === '/players') {
-    $list = [];
-    foreach (get_players() as $uuid => $name) {
-        $list[] = ['name' => $name, 'uuid' => $uuid] + get_player_stats($uuid);
-    }
-    respond($list);
+    respond(get_players());
+}
+
+if ($method === 'GET' && preg_match('#^/players/([0-9a-f-]{36})$#', $path, $m)) {
+    respond(get_player($m[1]));
 }
 
 // Ingen route matchade
