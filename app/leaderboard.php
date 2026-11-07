@@ -13,6 +13,7 @@ const LEADERBOARDS = [
 //  Leaderboard!
 // ============================================================
 function get_leaderboard($type) {
+    $type = strtolower($type);
     if (!in_array($type, LEADERBOARDS)) {
         respond(['error' => 'Leaderboard not found'], 404);
     }
