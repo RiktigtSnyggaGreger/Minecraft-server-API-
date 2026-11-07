@@ -23,17 +23,25 @@ function get_player($id) {
     }
     $names = get_players();
     $name = $names[$uuid] ?? null;
-    $stats = read_json(STATS_DIR . '/' .  $uuid . '.json');
+    $file = STATS_DIR . '/' .  $uuid . '.json';
+    $stats = read_json($file);
     if ($stats === null && $name === null) {
         respond(['error' => 'Player not found'], 404);
     }
     $ticks = $stats['stats']['minecraft:custom']['minecraft:play_time'] ?? 0;
         
     $hours = round($ticks / 72000, 1);
+
+    $last_seen = null;
+    if (is_file($file)) {
+        $last_seen = date('c', filemtime($file));
+    }
+    
     return [
         'uuid' => $uuid,
         'name' => $name,
         'play_time_hours' => $hours,
+        'last_seen' => $last_seen,
         'stats' => clean_stats($stats['stats'] ?? []),
     ];
 }
@@ -41,17 +49,27 @@ function get_player($id) {
 function get_player_list() {
     $names = get_players();
     $list = [];
+    
     foreach ($names as $uuid => $name) {
-        $stats = read_json(STATS_DIR . '/' .  $uuid . '.json');    
+        $file = STATS_DIR . '/' .  $uuid . '.json';
+        $stats = read_json($file);  
+        $last_seen = null;  
+        if (is_file($file)) {
+            $last_seen = date('c', filemtime($file));
+        }
         $ticks = $stats['stats']['minecraft:custom']['minecraft:play_time'] ?? 0;
         $hours = round($ticks / 72000, 1);
         $list[] = [
             'uuid' => $uuid,
             'name' => $name,
             'play_time_hours' => $hours,
+            'last_seen' => $last_seen,
             'advancements' => count(read_advancements($uuid)),
         ];
     }
+
+    
+
     // En lätt sort.. Sortar den som har mest timmar
     usort($list, function ($a, $b) {
         return $b['play_time_hours'] <=> $a['play_time_hours'];
