@@ -5,7 +5,9 @@ header('Access-Control-Allow-Origin: *');
 require __DIR__ . '/helper.php';
 require __DIR__ . '/db.php';
 require __DIR__ . '/player.php';
-require __DIR__ . '/leaderboard.php'; 
+require __DIR__ . '/leaderboard.php';
+require __DIR__ . '/server.php';
+
 
 // ============================================================
 //  Router
@@ -24,6 +26,11 @@ if ($method === 'GET' && $path === '/') {
         'minecraft_data' => 'up',
     ]);
 }
+
+if ($method === 'GET' && $path === '/server') {
+    respond(get_server_status());
+}
+
 
 if ($method === 'GET' && $path === '/players') {
     respond(get_player_list());

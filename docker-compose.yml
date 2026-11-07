@@ -20,6 +20,8 @@ services:
       DB_PASSWORD: ${DB_PASSWORD}
     depends_on:
       - db
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
   db:
     image: mariadb:11
