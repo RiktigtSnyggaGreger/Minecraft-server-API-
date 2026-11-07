@@ -77,10 +77,10 @@ function get_advancements($id) {
         respond(['error' => 'Player not found'], 404);
     }
     $names = get_players();
-    $file = read_json(ADVANCEMENTS_DIR . '/' .  $uuid . '.json');
-    if ($file === null) {
+    if (!is_file(ADVANCEMENTS_DIR . '/' .  $uuid . '.json')) {
         respond(['error' => 'Player not found'], 404);
     }
+
     return [
         'uuid' => $uuid,
         'name' => $names[$uuid] ?? null,
