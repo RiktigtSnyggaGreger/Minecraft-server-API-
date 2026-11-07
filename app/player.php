@@ -18,9 +18,25 @@ function get_player($uuid) {
     if ($stats === null) {
         respond(['error' => 'Player not found'], 404);
     }
+    $ticks = $stats['stats']['minecraft:custom']['minecraft:play_time'] ?? 0;
+    
+    $hours = round($ticks / 72000, 1);
     return [
         'uuid' => $uuid,
         'name' => $names[$uuid] ?? null,
-        'stats' => $stats['stats'],
+        'play_time_hours' => $hours,
+        'stats' => clean_stats($stats['stats']),
     ];
+}
+
+function clean_stats($stats) {
+    $clean = [];
+    foreach ($stats as $category => $items) {
+        $cat = str_replace('minecraft:', '', $category);
+        foreach ($items as $item => $count) {
+            $name = str_replace('minecraft:', '', $item);
+            $clean[$cat][$name] = $count;
+        }
+    }
+    return $clean;
 }
