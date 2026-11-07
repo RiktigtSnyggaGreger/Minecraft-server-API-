@@ -13,7 +13,11 @@ function get_players() {
     return $usernames;
 }
 
-function get_player($uuid) {
+function get_player($id) {
+    $uuid = resolve_uuid($id);
+    if ($uuid === null) {
+        respond(['error' => 'Player not found'], 404);
+    }
     $names = get_players();
     $stats = read_json(STATS_DIR . '/' .  $uuid . '.json');
     if ($stats === null) {
@@ -42,7 +46,11 @@ function clean_stats($stats) {
     return $clean;
 }
 
-function get_advancements($uuid) {
+function get_advancements($id) {
+    $uuid = resolve_uuid($id);
+    if ($uuid === null) {
+        respond(['error' => 'Player not found'], 404);
+    }
     $names = get_players();
     $file = read_json(ADVANCEMENTS_DIR . '/' .  $uuid . '.json');
     if ($file === null) {
@@ -68,3 +76,22 @@ function get_advancements($uuid) {
         'advancements' => $done,
     ];
 }
+
+function find_uuid($name) {
+    $names = get_players();
+    foreach ($names as $uuid => $n) {
+        if (strtolower($n) === strtolower($name)) {
+            return $uuid;
+        }
+    }
+    return null;
+}
+
+function resolve_uuid($id) {
+    if (preg_match('#^[0-9a-f-]{36}$#', $id)) {
+        return $id;
+    } else {
+        return find_uuid($id);
+    }
+}
+
