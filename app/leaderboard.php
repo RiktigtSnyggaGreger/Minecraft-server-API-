@@ -18,7 +18,8 @@ function get_leaderboard($type) {
     }
     $names = get_players();
     $list = [];
-    foreach ($names as $uuid => $name) {
+    foreach (get_uuids() as $uuid) {
+        $name = $names[$uuid] ?? null;
         $stats = read_json(STATS_DIR . '/' . $uuid . '.json');
         $custom = $stats['stats']['minecraft:custom'] ?? [];
         $value = match ($type) {
@@ -39,6 +40,7 @@ function get_leaderboard($type) {
             'items_crafted' => array_sum($stats['stats']['minecraft:crafted'] ?? []),
         };
         $list[] = [
+            'uuid' => $uuid,
             'name' => $name,
             'value' => $value,
         ];

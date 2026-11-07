@@ -16,6 +16,16 @@ function get_players() {
     return $usernames;
 }
 
+// Alla som har spelat = alla som har en stats-fil.
+// (usercache kan sakna gamla spelare, så den används bara för namnen)
+function get_uuids() {
+    $uuids = [];
+    foreach (glob(STATS_DIR . '/*.json') as $file) {
+        $uuids[] = basename($file, '.json');
+    }
+    return $uuids;
+}
+
 function get_player($id) {
     $uuid = resolve_uuid($id);
     if ($uuid === null) {
@@ -49,8 +59,9 @@ function get_player($id) {
 function get_player_list() {
     $names = get_players();
     $list = [];
-    
-    foreach ($names as $uuid => $name) {
+
+    foreach (get_uuids() as $uuid) {
+        $name = $names[$uuid] ?? null;
         $file = STATS_DIR . '/' .  $uuid . '.json';
         $stats = read_json($file);  
         $last_seen = null;  
