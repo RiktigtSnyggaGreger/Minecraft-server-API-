@@ -34,5 +34,9 @@ if ($method === 'GET' && preg_match('#^/players/([0-9a-f-]{36})$#', $path, $m)) 
     respond(get_player($m[1]));
 }
 
+if ($method === 'GET' && preg_match('#^/players/([0-9a-f-]{36})/advancements$#', $path, $m)) {
+    respond(get_advancements($m[1]));
+}
+
 // Ingen route matchade
 respond(['error' => 'Not found'], 404);

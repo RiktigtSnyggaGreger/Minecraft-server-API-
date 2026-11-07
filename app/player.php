@@ -2,6 +2,7 @@
 const MC_DIR    = '/minecraft';
 const USERCACHE = MC_DIR . '/usercache.json';
 const STATS_DIR = MC_DIR . '/world/players/stats';
+const ADVANCEMENTS_DIR = MC_DIR . '/world/players/advancements';
 
 function get_players() {
     $cashe = read_json(USERCACHE) ?? [];
@@ -39,4 +40,31 @@ function clean_stats($stats) {
         }
     }
     return $clean;
+}
+
+function get_advancements($uuid) {
+    $names = get_players();
+    $file = read_json(ADVANCEMENTS_DIR . '/' .  $uuid . '.json');
+    if ($file === null) {
+        respond(['error' => 'Player not found'], 404);
+    }
+    $done = [];
+    foreach ($file as $key => $adv) {
+        if ($key === 'DataVersion') {
+            continue;
+        }
+        if (str_contains($key, 'recipes/')) {
+            continue;
+        }
+        if ($adv['done'] === true) {
+            $name = str_replace('minecraft:', '', $key);
+            $date = max($adv['criteria']);
+            $done[$name] = $date;
+        }
+    }
+    return [
+        'uuid' => $uuid,
+        'name' => $names[$uuid] ?? null,
+        'advancements' => $done,
+    ];
 }
