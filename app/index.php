@@ -7,6 +7,7 @@ require __DIR__ . '/db.php';
 require __DIR__ . '/player.php';
 require __DIR__ . '/leaderboard.php';
 require __DIR__ . '/server.php';
+require __DIR__ . '/history.php';
 
 
 // ============================================================
@@ -42,6 +43,10 @@ if ($method === 'GET' && preg_match('#^/players/([\w-]+)$#', $path, $m)) {
 
 if ($method === 'GET' && preg_match('#^/players/([\w-]+)/advancements$#', $path, $m)) {
     respond(get_advancements($m[1]));
+}
+
+if ($method === 'GET' && preg_match('#^/players/([\w-]+)/history$#', $path, $m)) {
+    respond(get_player_history($db, $m[1]));
 }
 
 if ($method === 'GET' && $path === '/leaderboard') {

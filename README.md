@@ -59,6 +59,7 @@ Alla routes är `GET` och svarar med JSON. `Access-Control-Allow-Origin: *` är 
 | [`/players`](#get-players) | Alla spelare med sammanfattning |
 | [`/players/{id}`](#get-playersid) | En spelare med alla stats |
 | [`/players/{id}/advancements`](#get-playersidadvancements) | En spelares advancements |
+| [`/players/{id}/history`](#get-playersidhistory) | En spelares stats per dag (för grafer) |
 | [`/leaderboard`](#get-leaderboard) | Topp 3 i alla topplistor |
 | [`/leaderboard/{typ}`](#get-leaderboardtyp) | En hel topplista |
 | [`/leaderboard/{kategori}/{sak}`](#get-leaderboardkategorisak) | Topplista för en specifik sak, t.ex. ett block eller en mob |
@@ -183,6 +184,25 @@ Klara advancements (utan recept) och när de klarades.
 
 Datumen är i Minecrafts eget format (UTC). Nycklar som slutar på `/root` är flikarna i advancement-menyn (Story, Nether osv.).
 
+#### `GET /players/{id}/history`
+Spelarens stats en gång per dag, äldst först. Perfekt för grafer.
+
+```json
+{
+  "uuid": "328f55df-4e2d-42dc-9f8f-7d36a3433849",
+  "name": "SaintJamesBaddie",
+  "history": [
+    { "day": "2026-11-07", "play_time": 8.7, "deaths": 0, "mob_kills": 108, "damage_dealt": 1650,
+      "walked_blocks": 11229, "blocks_mined": 5066, "items_crafted": 3445 }
+  ]
+}
+```
+
+- Värdena är **totaler** för den dagen, inte vad som hände just den dagen. "Spelade idag" = dagens `play_time` minus gårdagens.
+- Samma namn och enheter som [topplistorna](#get-leaderboardtyp).
+- `day` är i UTC.
+- Historiken börjar den dag `snapshot.php` började köras. Den kan vara tom (`[]`) för nya spelare.
+
 ---
 
 ### Topplistor
@@ -278,7 +298,10 @@ app/
 ├── db.php           Anslutning till MariaDB ($db)
 ├── player.php       Spelare, stats och advancements
 ├── leaderboard.php  Topplistor och /stats
-└── server.php       /server, pratar Minecrafts status-protokoll
+├── server.php       /server, pratar Minecrafts status-protokoll
+├── history.php      /players/{id}/history, läser från databasen
+└── snapshot.php     Script (inte en route!) som sparar stats i databasen
+sql/schema.sql       Databastabellen snapshots
 php/Dockerfile       PHP-image (mysqli, döljer fel och version)
 nginx.conf           Skickar allt till index.php
 docker-compose.yml   nginx, PHP, MariaDB och Cloudflare-tunnel
@@ -294,6 +317,20 @@ Minecraft-mappen är monterad **read-only** på `/minecraft` i PHP-containern.
 | `/minecraft/world/players/advancements/<uuid>.json` | Advancements per spelare |
 
 Alla som har en stats-fil räknas som spelare. Usercache används bara för att slå upp namn.
+
+---
+
+### Historik (databasen)
+`app/snapshot.php` sparar allas stats i tabellen `snapshots`, en rad per spelare och dag. Den körs **varje timme** av cron på värddatorn, och dagens sista körning vinner:
+
+```
+0 * * * * cd /home/ed/api && /usr/bin/docker compose exec -T php php /var/www/html/snapshot.php >> /home/ed/snapshot.log 2>&1
+```
+
+- Skapa tabellen (första gången): `docker compose exec -T db sh -c 'mariadb -u ed -p"$MARIADB_PASSWORD" appdb' < sql/schema.sql`
+- Kör för hand: `docker compose exec php php /var/www/html/snapshot.php`
+- Logg: `tail ~/snapshot.log`
+- Databasen sparar **rådata** (ticks, cm). Omräkning sker när den läses.
 
 ---
 
