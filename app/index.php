@@ -11,7 +11,7 @@ $method = $_SERVER['REQUEST_METHOD'];
 $path   = rtrim(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '/') ?: '/';
 
 if ($method === 'GET' && $path === '/players') {
-    respond(get_players());
+    respond(get_player_list());
 }
 
 if ($method === 'GET' && preg_match('#^/players/([\w-]+)$#', $path, $m)) {

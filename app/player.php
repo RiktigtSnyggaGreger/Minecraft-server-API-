@@ -27,7 +27,7 @@ function get_player($id) {
         respond(['error' => 'Player not found'], 404);
     }
     $ticks = $stats['stats']['minecraft:custom']['minecraft:play_time'] ?? 0;
-    
+        
     $hours = round($ticks / 72000, 1);
     return [
         'uuid' => $uuid,
@@ -35,6 +35,23 @@ function get_player($id) {
         'play_time_hours' => $hours,
         'stats' => clean_stats($stats['stats']),
     ];
+}
+
+function get_player_list() {
+    $names = get_players();
+    $list = [];
+    foreach ($names as $uuid => $name) {
+        $stats = read_json(STATS_DIR . '/' .  $uuid . '.json');    
+        $ticks = $stats['stats']['minecraft:custom']['minecraft:play_time'] ?? 0;
+        $hours = round($ticks / 72000, 1);
+        $list[] = [
+            'uuid' => $uuid,
+            'name' => $name,
+            'play_time_hours' => $hours,
+            'advancements' => count(read_advancements($uuid)),
+        ];
+    }
+    return $list;
 }
 
 // ============================================================
@@ -64,6 +81,14 @@ function get_advancements($id) {
     if ($file === null) {
         respond(['error' => 'Player not found'], 404);
     }
+    return [
+        'uuid' => $uuid,
+        'name' => $names[$uuid] ?? null,
+        'advancements' => read_advancements($uuid),
+    ];
+}
+function read_advancements($uuid) {
+    $file = read_json(ADVANCEMENTS_DIR . '/' .  $uuid . '.json') ?? [];
     $done = [];
     foreach ($file as $key => $adv) {
         if ($key === 'DataVersion') {
@@ -78,12 +103,9 @@ function get_advancements($id) {
             $done[$name] = $date;
         }
     }
-    return [
-        'uuid' => $uuid,
-        'name' => $names[$uuid] ?? null,
-        'advancements' => $done,
-    ];
+    return $done;
 }
+
 
 // ============================================================
 //  uuid fix
