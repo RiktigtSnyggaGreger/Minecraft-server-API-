@@ -1,5 +1,7 @@
 <?php
 header('Content-Type: application/json; charset=utf-8');
+header('Access-Control-Allow-Origin: *');
+
 require __DIR__ . '/helper.php';
 require __DIR__ . '/db.php';
 require __DIR__ . '/player.php';
