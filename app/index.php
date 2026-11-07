@@ -10,6 +10,18 @@ require __DIR__ . '/player.php';
 $method = $_SERVER['REQUEST_METHOD'];
 $path   = rtrim(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '/') ?: '/';
 
+if ($method === 'GET' && $path === '/') {
+
+    if (!is_file(USERCACHE)) {
+        respond(['error' => 'Minecraft data unavailable'], 503);
+    }
+    respond([
+        'status' => 'ok',
+        'database' => 'up',
+        'minecraft_data' => 'up',
+    ]);
+}
+
 if ($method === 'GET' && $path === '/players') {
     respond(get_player_list());
 }
